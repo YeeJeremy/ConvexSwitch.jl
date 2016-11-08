@@ -12,9 +12,10 @@ using NearestNeighbors
 export CSS, Bellman, Path, PermMat, SGrid
 
 ## Export functions
-export row_rearrange, expected, expected_host, expected_fast
+export disturb_mat, row_rearrange, expected, expected_host, expected_fast
 
 ## Include source files
+include("disturb_mat.jl")
 include("CSS.jl")
 include("Path.jl")
 include("PermMat.jl")

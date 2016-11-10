@@ -19,7 +19,7 @@ include("functions_mat.jl")
 include("CSS.jl")
 include("Path.jl")
 include("PermMat.jl")
-include("functions.jl")
+include("functions_bellman.jl")
 include("SGrid.jl")
 include("Bellman.jl")
 

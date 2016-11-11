@@ -47,7 +47,7 @@ immutable Bellman
         
         ## Backwards induction
         for i = 1:gnum
-            for p in 1:pnum
+            for p = 1:pnum
                 value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
             end
         end
@@ -123,7 +123,7 @@ immutable Bellman
         
         ## Backwards induction
         for i = 1:gnum
-            for p in 1:pnum
+            for p = 1:pnum
                 value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
             end
         end
@@ -189,7 +189,7 @@ immutable Bellman
         
         ## Backwards induction
         for i = 1:gnum
-            for p in 1:pnum
+            for p = 1:pnum
                 value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
             end
         end

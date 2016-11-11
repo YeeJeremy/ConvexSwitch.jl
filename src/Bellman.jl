@@ -41,7 +41,7 @@ immutable Bellman
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
         evalue = zero(Array{Float64}(gnum, snum, pnum, tnum - 1))
         policy = zero(Array{Int64}(gnum, pnum, tnum - 1))
-        container=zero(Matrix{Float64}(css.anum, css.snum))
+        container = zero(Matrix{Float64}(anum, snum))
         
         ## Backwards induction
         for i = 1:gnum
@@ -106,7 +106,7 @@ immutable Bellman
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
         evalue = zero(Array{Float64}(gnum, snum, pnum, tnum - 1))
         policy = zero(Array{Int64}(gnum, pnum, tnum - 1))
-        container=zero(Matrix{Float64}(css.anum, css.snum))
+        container = zero(Matrix{Float64}(anum, snum))
 
         ## Batch processing of neighbours for faster speed
         indices = Array{Array{Int64, 1}}(gnum * dnum)
@@ -181,7 +181,7 @@ immutable Bellman
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
         evalue = zero(Array{Float64}(gnum, snum, pnum, tnum - 1))
         policy = zero(Array{Int64}(gnum, pnum, tnum - 1))
-        container=zero(Matrix{Float64}(css.anum, css.snum))
+        container = zero(Matrix{Float64}(anum, snum))
         
         ## Backwards induction
         for i = 1:gnum

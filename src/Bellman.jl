@@ -12,6 +12,7 @@ immutable Bellman
     evalue::Array{Float64, 4} # subgradient rep of expected value functions    
     policy::Array{Int64, 3} # prescribed policy    
     method::ASCIIString # slow, neighbours or fast method for continuation value
+    grid::Array{Float64, 2} # the grid used
 
     ## Parameters
     gnum::Int64 # grid size
@@ -28,7 +29,7 @@ immutable Bellman
         
         method = "row-rearrange"        
 
-        ## Extract all the info from CSS
+        ## Extract info from CSS
         gnum = css.gnum
         snum = css.snum
         dnum = css.dnum
@@ -36,6 +37,7 @@ immutable Bellman
         anum = css.anum
         tnum = css.tnum
         fullcontrol = css.fullcontrol
+        grid = css.grid
 
         ## Containers
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
@@ -46,7 +48,7 @@ immutable Bellman
         ## Backwards induction
         for i = 1:gnum
             for p in 1:pnum
-                value[i, :, p, tnum] = css.Scrap(css.grid[i, :], p)
+                value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
             end
         end
         t = tnum - 1
@@ -54,7 +56,7 @@ immutable Bellman
             print(t)
             print(".")
             for p = 1:pnum
-                evalue[:, :, p, t] = expected(value[:, :, p, t + 1], css.grid,
+                evalue[:, :, p, t] = expected(value[:, :, p, t + 1], grid,
                                               css.disturb, css.weight)
             end
             for i = 1:gnum
@@ -63,24 +65,24 @@ immutable Bellman
                     if css.fullcontrol # full control of positions
                         for a = 1:anum
                             container[a, :] = evalue[i, :, css.control[p, a], t]
-                            container[a, :] += css.Reward(t, css.grid[i, :], p, a)
+                            container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end                        
                     else # partial control of positions
                         for a = 1:anum
                             for pp = 1:pnum
                                 container[a, :] += css.control[p, a, pp] * evalue[i, :, pp, t]
                             end
-                            container[a, :] += css.Reward(t, css.grid[i, :], p, a)
+                            container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
                     end
-                    policy[i, p] = indmax(container * css.grid[i, :])
+                    policy[i, p] = indmax(container * grid[i, :])
                     value[i, :, p, t] = container[policy[i, p], :]
                 end
             end
             t = t - 1
         end
         
-        return new(value, evalue, policy, method, gnum, snum, dnum, pnum, anum,
+        return new(value, evalue, policy, method, grid, gnum, snum, dnum, pnum, anum,
                    tnum, fullcontrol)
 
     end
@@ -93,7 +95,7 @@ immutable Bellman
         
         method = "nearest-neighbors"        
 
-        ## Extract all the info from CSS
+        ## Extract info from CSS
         gnum = css.gnum
         snum = css.snum
         dnum = css.dnum
@@ -101,6 +103,7 @@ immutable Bellman
         anum = css.anum
         tnum = css.tnum
         fullcontrol = css.fullcontrol
+        grid = css.grid
 
         ## Containers
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
@@ -111,7 +114,7 @@ immutable Bellman
         ## Batch processing of neighbours for faster speed
         indices = Array{Array{Int64, 1}}(gnum * dnum)
         temp_indices = Array{Array{Int64, 1}}(gnum)
-        tgrid = transpose(css.grid)
+        tgrid = transpose(grid)
         tree = search(tgrid)
         for i = 1:dnum
             temp_indices = knn(tree, css.disturb[:, :, i] * tgrid, k, true)[1]
@@ -121,7 +124,7 @@ immutable Bellman
         ## Backwards induction
         for i = 1:gnum
             for p in 1:pnum
-                value[i, :, p, tnum] = css.Scrap(css.grid[i, :], p)
+                value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
             end
         end
         t = tnum - 1
@@ -129,7 +132,7 @@ immutable Bellman
             print(t)
             print(".")
             for p = 1:pnum
-                evalue[:, :, p, t] = expected_host(value[:, :, p, t + 1], css.grid,
+                evalue[:, :, p, t] = expected_host(value[:, :, p, t + 1], grid,
                                                    css.disturb, css.weight, indices)
             end
             for i = 1:gnum
@@ -138,24 +141,24 @@ immutable Bellman
                     if css.fullcontrol # full control of positions
                         for a = 1:anum
                             container[a, :] = evalue[i, :, css.control[p, a], t]
-                            container[a, :] += css.Reward(t, css.grid[i, :], p, a)
+                            container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end                        
                     else # partial control of positions
                         for a = 1:anum
                             for pp = 1:pnum
                                 container[a, :] += css.control[p, a, pp] * evalue[i, :, pp, t]
                             end
-                            container[a, :] += css.Reward(t, css.grid[i, :], p, a)
+                            container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
                     end
-                    policy[i, p] = indmax(container * css.grid[i, :])
+                    policy[i, p] = indmax(container * grid[i, :])
                     value[i, :, p, t] = container[policy[i, p], :]
                 end
             end
             t = t - 1
         end
         
-        return new(value, evalue, policy, method, gnum, snum, dnum, pnum, anum,
+        return new(value, evalue, policy, method, grid, gnum, snum, dnum, pnum, anum,
                    tnum, fullcontrol)
 
     end
@@ -168,7 +171,7 @@ immutable Bellman
         
         method = "fast"        
 
-        ## Extract all the info from CSS
+        ## Extract info from CSS
         gnum = css.gnum
         snum = css.snum
         dnum = css.dnum
@@ -176,7 +179,8 @@ immutable Bellman
         anum = css.anum
         tnum = css.tnum
         fullcontrol = css.fullcontrol
-
+        grid = css.grid
+        
         ## Containers
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
         evalue = zero(Array{Float64}(gnum, snum, pnum, tnum - 1))
@@ -186,7 +190,7 @@ immutable Bellman
         ## Backwards induction
         for i = 1:gnum
             for p in 1:pnum
-                value[i, :, p, tnum] = css.Scrap(css.grid[i, :], p)
+                value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
             end
         end
         t = tnum - 1
@@ -202,24 +206,24 @@ immutable Bellman
                     if css.fullcontrol # full control of positions
                         for a = 1:anum
                             container[a, :] = evalue[i, :, css.control[p, a], t]
-                            container[a, :] += css.Reward(t, css.grid[i, :], p, a)
+                            container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end                        
                     else # partial control of positions
                         for a = 1:anum
                             for pp = 1:pnum
                                 container[a, :] += css.control[p, a, pp] * evalue[i, :, pp, t]
                             end
-                            container[a, :] += css.Reward(t, css.grid[i, :], p, a)
+                            container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
                     end
-                    policy[i, p] = indmax(container * css.grid[i, :])
+                    policy[i, p] = indmax(container * grid[i, :])
                     value[i, :, p, t] = container[policy[i, p], :]
                 end
             end
             t = t - 1
         end
         
-        return new(value, evalue, policy, method, gnum, snum, dnum, pnum, anum,
+        return new(value, evalue, policy, method, grid, gnum, snum, dnum, pnum, anum,
                    tnum, fullcontrol)
 
     end

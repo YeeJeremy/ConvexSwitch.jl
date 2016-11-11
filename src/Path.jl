@@ -10,7 +10,7 @@ immutable Path
     ## Members
     snum::Int64 # state size
     tnum::Int64 # time points
-    pnum::Int64 # number of paths
+    pathnum::Int64 # number of paths
     sample::Array{Float64, 3} # sample paths
 
     function Path(start::Array{Float64, 1}, disturb::Array{Float64, 4})
@@ -18,18 +18,18 @@ immutable Path
         ## Extract parameters
         snum = length(start);
         tnum = size(disturb)[3] + 1;
-        pnum = size(disturb)[4];
-        sample = Array{Float64}(tnum, pnum, snum);
+        pathnum = size(disturb)[4];
+        sample = Array{Float64}(tnum, pathnum, snum);
     
         ## Simulate paths
-        for p = 1:pnum
+        for p = 1:pathnum
             sample[1, p, :] = start;
             for t = 2:tnum
                 sample[t, p, :] = disturb[:, :, t - 1, p] * sample[t - 1, p, :];
             end
         end
 
-        return new(snum, tnum, pnum, sample);
+        return new(snum, tnum, pathnum, sample);
 
     end
 

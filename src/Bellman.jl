@@ -75,8 +75,8 @@ immutable Bellman
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
                     end
-                    policy[i, p] = indmax(container * grid[i, :])
-                    value[i, :, p, t] = container[policy[i, p], :]
+                    policy[i, p, t] = indmax(container * grid[i, :])
+                    value[i, :, p, t] = container[policy[i, p, t], :]
                 end
             end
             t = t - 1

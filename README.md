@@ -16,3 +16,6 @@ This Julia package provides a method in which convex switching systems
 can be numerically solved. A work in progress. Only the Bellman recursion
 (slow, neighbours and fast) is implemented. The primal-dual methods will
 be implemented at a later date.
+
+BUG: Bounds are not tight. Either martingale increments are not computed
+correctly or the duality recutsion is buggy.

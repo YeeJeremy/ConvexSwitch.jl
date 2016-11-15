@@ -60,7 +60,7 @@ immutable PathPolicy
                         for a = 1:anum
                             for pp = 1:pnum
                                 container[a, :] += css.control[p, a, pp] *
-                                    bellman.evalue[neighbours[i], :, css.control[p, a], t]
+                                    bellman.evalue[neighbours[i], :, pp, t][:]
                             end
                             container[a, :] += css.Reward(t, path_state[i, :], p, a)
                         end                        

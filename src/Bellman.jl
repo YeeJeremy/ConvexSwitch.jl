@@ -48,6 +48,7 @@ immutable Bellman
         container = zero(Matrix{Float64}(anum, snum))
         
         ## Backwards induction
+        print("Bellman: ", tnum, ".")
         for i = 1:gnum
             for p = 1:pnum
                 value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
@@ -55,8 +56,7 @@ immutable Bellman
         end
         t = tnum - 1
         while (t > 0)
-            print(t)
-            print(".")
+            print(t, ".")
             for p = 1:pnum
                 evalue[:, :, p, t] = expected(value[:, :, p, t + 1], grid,
                                               css.disturb, css.weight)
@@ -83,7 +83,8 @@ immutable Bellman
             end
             t = t - 1
         end
-        
+
+        print("End.\n")
         return new(value, evalue, policy, method, grid, control, gnum, snum,
                    dnum, pnum, anum, tnum, fullcontrol)
 
@@ -125,6 +126,7 @@ immutable Bellman
         end        
         
         ## Backwards induction
+        print("Bellman: ", tnum, ".")
         for i = 1:gnum
             for p = 1:pnum
                 value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
@@ -132,8 +134,7 @@ immutable Bellman
         end
         t = tnum - 1
         while (t > 0)
-            print(t)
-            print(".")
+            print(t, ".")
             for p = 1:pnum
                 evalue[:, :, p, t] = expected_host(value[:, :, p, t + 1], grid,
                                                    css.disturb, css.weight, indices)
@@ -161,6 +162,7 @@ immutable Bellman
             t = t - 1
         end
         
+        print("End.\n")
         return new(value, evalue, policy, method, grid, control, gnum, snum,
                    dnum, pnum, anum, tnum, fullcontrol)
 
@@ -192,6 +194,7 @@ immutable Bellman
         container = zero(Matrix{Float64}(anum, snum))
         
         ## Backwards induction
+        print("Bellman: ", tnum, ".")
         for i = 1:gnum
             for p = 1:pnum
                 value[i, :, p, tnum] = css.Scrap(grid[i, :], p)
@@ -199,8 +202,7 @@ immutable Bellman
         end
         t = tnum - 1
         while (t > 0)
-            print(t)
-            print(".")
+            print(t, ".")
             for p = 1:pnum
                 evalue[:, :, p, t] = expected_fast(value[:, :, p, t + 1], X)
             end
@@ -227,6 +229,7 @@ immutable Bellman
             t = t - 1
         end
         
+        print("End.\n")
         return new(value, evalue, policy, method, grid, control, gnum, snum,
                    dnum, pnum, anum, tnum, fullcontrol)
 

@@ -61,14 +61,14 @@ immutable Mart
                        fullcontrol)
         else # partial control of positions
             ## Container
-            result2 = zeros(Array{Float64}(tnum - 1, pnum, anum, pathnum))
-            prob_weight = Array{Float64}(1, pnum)            
+            result2 = Array{Float64}(tnum - 1, pnum, anum, pathnum)
+            prob_weight = Array{Float64}(pnum)            
             ## Adjust the martingales for partial control
             for t = 1:(tnum - 1)
                 for pos = 1:pnum
                     for a = 1:anum
                         prob_weight = bellman.control[pos, a, :]
-                        result2[t, pos, a, :] = prob_weight * result[t, :, :]
+                        result2[t, pos, a, :] = transpose(prob_weight) * result[t, :, :]
                     end
                 end
             end

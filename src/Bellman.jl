@@ -13,6 +13,7 @@ immutable Bellman
     policy::Array{Int64, 3} # prescribed policy    
     method::ASCIIString # slow, neighbours or fast method for continuation value
     grid::Array{Float64, 2} # the grid used
+    control::Array{Float64} # prob for position transitions
 
     ## Parameters
     gnum::Int64 # grid size
@@ -38,6 +39,7 @@ immutable Bellman
         tnum = css.tnum
         fullcontrol = css.fullcontrol
         grid = css.grid
+        control = css.control
 
         ## Containers
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
@@ -64,13 +66,13 @@ immutable Bellman
                     container = zero(container)
                     if css.fullcontrol # full control of positions
                         for a = 1:anum
-                            container[a, :] = evalue[i, :, css.control[p, a], t]
+                            container[a, :] = evalue[i, :, control[p, a], t]
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end                        
                     else # partial control of positions
                         for a = 1:anum
                             for pp = 1:pnum
-                                container[a, :] += css.control[p, a, pp] * evalue[i, :, pp, t]
+                                container[a, :] += control[p, a, pp] * evalue[i, :, pp, t]
                             end
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
@@ -82,8 +84,8 @@ immutable Bellman
             t = t - 1
         end
         
-        return new(value, evalue, policy, method, grid, gnum, snum, dnum, pnum, anum,
-                   tnum, fullcontrol)
+        return new(value, evalue, policy, method, grid, control, gnum, snum,
+                   dnum, pnum, anum, tnum, fullcontrol)
 
     end
 
@@ -104,6 +106,7 @@ immutable Bellman
         tnum = css.tnum
         fullcontrol = css.fullcontrol
         grid = css.grid
+        control = css.control
 
         ## Containers
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
@@ -140,13 +143,13 @@ immutable Bellman
                     container = zero(container)
                     if css.fullcontrol # full control of positions
                         for a = 1:anum
-                            container[a, :] = evalue[i, :, css.control[p, a], t]
+                            container[a, :] = evalue[i, :, control[p, a], t]
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end                        
                     else # partial control of positions
                         for a = 1:anum
                             for pp = 1:pnum
-                                container[a, :] += css.control[p, a, pp] * evalue[i, :, pp, t]
+                                container[a, :] += control[p, a, pp] * evalue[i, :, pp, t]
                             end
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
@@ -158,8 +161,8 @@ immutable Bellman
             t = t - 1
         end
         
-        return new(value, evalue, policy, method, grid, gnum, snum, dnum, pnum, anum,
-                   tnum, fullcontrol)
+        return new(value, evalue, policy, method, grid, control, gnum, snum,
+                   dnum, pnum, anum, tnum, fullcontrol)
 
     end
     
@@ -180,6 +183,7 @@ immutable Bellman
         tnum = css.tnum
         fullcontrol = css.fullcontrol
         grid = css.grid
+        control = css.control
         
         ## Containers
         value = zero(Array{Float64}(gnum, snum, pnum, tnum))
@@ -205,13 +209,13 @@ immutable Bellman
                     container = zero(container)
                     if css.fullcontrol # full control of positions
                         for a = 1:anum
-                            container[a, :] = evalue[i, :, css.control[p, a], t]
+                            container[a, :] = evalue[i, :, control[p, a], t]
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end                        
                     else # partial control of positions
                         for a = 1:anum
                             for pp = 1:pnum
-                                container[a, :] += css.control[p, a, pp] * evalue[i, :, pp, t]
+                                container[a, :] += control[p, a, pp] * evalue[i, :, pp, t]
                             end
                             container[a, :] += css.Reward(t, grid[i, :], p, a)
                         end     
@@ -223,8 +227,8 @@ immutable Bellman
             t = t - 1
         end
         
-        return new(value, evalue, policy, method, grid, gnum, snum, dnum, pnum, anum,
-                   tnum, fullcontrol)
+        return new(value, evalue, policy, method, grid, control, gnum, snum,
+                   dnum, pnum, anum, tnum, fullcontrol)
 
     end
 

@@ -11,7 +11,7 @@ immutable Bellman
     value::Array{Float64, 4} # subgradient rep of value functions
     evalue::Array{Float64, 4} # subgradient rep of expected value functions    
     policy::Array{Int64, 3} # prescribed policy    
-    method::ASCIIString # slow, neighbours or fast method for continuation value
+    method::String # slow, neighbours or fast method for continuation value
     grid::Array{Float64, 2} # the grid used
     control::Array{Float64} # prob for position transitions
 

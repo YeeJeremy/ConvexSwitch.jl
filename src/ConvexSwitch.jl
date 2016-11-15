@@ -9,7 +9,7 @@ using Clustering
 using NearestNeighbors
 
 ## Export immutable types
-export CSS, Bellman, Path, PermMat, SGrid, PathPolicy, Mart
+export CSS, Bellman, Path, PermMat, SGrid, PathPolicy, Mart, OptimalBounds
 
 ## Export functions
 export disturb_mat, path_mat, subsim_mat # generate disturb matrices
@@ -27,5 +27,6 @@ include("Bellman.jl")
 include("PathPolicy.jl")
 include("test_policy.jl")
 include("Mart.jl")
+include("OptimalBounds.jl")
 
 end # module

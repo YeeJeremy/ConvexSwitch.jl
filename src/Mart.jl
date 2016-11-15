@@ -89,7 +89,7 @@ immutable Mart
                   subsim_weight::Array{Float64, 1}, search::Function,
                   grid::Array{Float64, 2})
 
-        method = "row-rearrange"
+        method = "neighbors"
 
         ## Extract sizes from CSS
         pnum = bellman.pnum
@@ -158,6 +158,78 @@ immutable Mart
     end
 
 
+       ############################################################################
 
+       ## Finite distribution case
+    
+       function Mart(bellman::Bellman, path::Path, path_disturb::Array{Float64, 4},
+                     search::Function, grid::Array{Float64, 2})
+
+        method = "finite-distribution"
+
+        ## Extract sizes from CSS
+        pnum = bellman.pnum
+        anum = bellman.anum
+        pathnum = path.pathnum
+        subsimnum = 0
+        tnum = bellman.tnum
+        fullcontrol = bellman.fullcontrol
+            
+        ## Container
+        result = zeros(Array{Float64}(tnum - 1, pnum, pathnum))
+        path_state = Array{Float64}(bellman.snum)
+        host = Array{Float64}(bellman.snum)
+        disturb_host = Array{Float64}(bellman.snum)
+
+        ## Tree
+        tgrid = transpose(grid)
+        tree = search(tgrid)
+        
+        print("Martingales: ")
+        ##  Compute martingales
+        for t = 1:(tnum - 1)
+            print(t, ".")
+            for p = 1:pathnum
+                path_state = path.sample[t, p, :]
+                nn1 = knn(tree, path_state, 1, true)[1]
+                host = transpose(grid[nn1, :])
+                disturb_host = path_disturb[:, :, t, p] * host
+                nn2 = knn(tree, disturb_host, 1, true)[1][1]
+                for pos = 1:pnum
+                    ## Fining the average
+                    result[t, pos, p] = (bellman.evalue[nn1, :, pos, t] * host)[1]
+                    ## Subtracting the path realization
+                    result[t, pos, p] -=
+                        (bellman.value[nn2, :, pos, t + 1] * disturb_host)[1]
+                    
+                end
+            end    
+        end
+
+        if fullcontrol
+            print("End.\n")
+            return new(result, method, pnum, anum, pathnum, subsimnum, tnum,
+                       fullcontrol)
+        else # partial control of positions
+            ## Container
+            result2 = Array{Float64}(tnum - 1, pnum, anum, pathnum)
+            prob_weight = Array{Float64}(pnum)            
+            ## Adjust the martingales for partial control
+            for t = 1:(tnum - 1)
+                for pos = 1:pnum
+                    for a = 1:anum
+                        prob_weight = bellman.control[pos, a, :]
+                        result2[t, pos, a, :] = transpose(prob_weight) * result[t, :, :]
+                    end
+                end
+            end
+
+            print("End.\n")
+            return new(result2, method, pnum, anum, pathnum, subsimnum, tnum,
+                       fullcontrol)
+
+        end
+        
+    end
 
 end

@@ -38,9 +38,9 @@ immutable Mart
         ##  Compute martingales
         for t = 1:(tnum - 1)
             print(t, ".")
-            for p = 1:pathnum
-                path_state = path.sample[t, p, :]
-                for pos = 1:pnum
+            for pos = 1:pnum
+                for p = 1:pathnum
+                    path_state = path.sample[t, p, :]
                     ## Finding the average
                     for h = 1:subsimnum                       
                         result[t, pos, p] += subsim_weight[h] *
@@ -112,9 +112,9 @@ immutable Mart
         ##  Compute martingales
         for t = 1:(tnum - 1)
             print(t, ".")
-            for p = 1:pathnum
-                path_state = path.sample[t, p, :]
-                for pos = 1:pnum
+            for pos = 1:pnum
+                for p = 1:pathnum
+                    path_state = path.sample[t, p, :]
                     ## Finding the average
                     for h = 1:subsimnum
                         disturb_state = subsim[:, :, p, h, t] * path_state

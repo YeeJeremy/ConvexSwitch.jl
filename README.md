@@ -8,7 +8,7 @@
 
 ## Authors
 
-Juri Hinz and Jeremy Yee
+Jeremy Yee and Juri Hinz
 
 ## About
 
